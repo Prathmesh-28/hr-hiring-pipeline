@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(HR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  applications Application[] @relation("ApplicationReviewer")
+}
+
+enum Role {
+  ADMIN
+  HR
+  HIRING_MANAGER
+}
+
+model Candidate {
+  id             String        @id @default(uuid())
+  email          String
+  firstName      String
+  lastName       String
+  phone          String?
+  source         String?
+  currentCompany String?
+  currentTitle   String?
+  location       String?
+  resumeUrl      String?
+  profileText    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  applications   Application[]
+}
+
+model Application {
+  id                String         @id @default(uuid())
+  candidateId       String
+  jobId             String
+  stage             Stage          @default(APPLIED)
+  status            ApplicationStatus @default(PENDING)
+  resumeParsedText  String?
+  score             Float?         
+  fitScore          Float?         
+  flagged           Boolean        @default(false)
+  source            String?
+  submittedAt       DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  candidate         Candidate      @relation(fields: [candidateId], references: [id])
+  feedback          Feedback[]
+  events            Event[]
+  offer             Offer?
+}
+
+enum Stage {
+  APPLIED
+  SCREENING
+  INTERVIEW
+  OFFER
+  HIRED
+  REJECTED
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  WITHDRAWN
+}
+
+model Feedback {
+  id            String   @id @default(uuid())
+  applicationId String
+  reviewerId    String
+  rating        Int
+  comment       String?
+  createdAt     DateTime @default(now())
+  application   Application @relation(fields: [applicationId], references: [id])
+  reviewer      User        @relation(fields: [reviewerId], references: [id])
+}
+
+model Offer {
+  id                 String   @id @default(uuid())
+  applicationId      String   @unique
+  title              String
+  level              String
+  salaryRange        String
+  equity             String?
+  status             OfferStatus @default(PENDING)
+  documentUrl        String?
+  docusignEnvelopeId String?  @unique
+  sentAt             DateTime?
+  acceptedAt         DateTime?
+  declinedAt         DateTime?
+  application        Application @relation(fields: [applicationId], references: [id])
+}
+
+enum OfferStatus {
+  PENDING
+  SENT
+  ACCEPTED
+  DECLINED
+}
+
+model Event {
+  id            String   @id @default(uuid())
+  applicationId String
+  type          EventType
+  payload       Json?
+  createdAt     DateTime @default(now())
+  application   Application @relation(fields: [applicationId], references: [id])
+}
+
+enum EventType {
+  APPLICATION_SUBMITTED
+  STAGE_UPDATED
+  EMAIL_SENT
+  INTERVIEW_SCHEDULED
+  OFFER_GENERATED
+  OFFER_ACCEPTED
+  TASK_COMPLETED
+}
