@@ -29,7 +29,7 @@ export default function Apply() {
   const [status, setStatus] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:4000/applications/jobs").then((res) => setJobs(res.data));
+    axios.get(`${API_BASE}/applications/jobs`).then((res) => setJobs(res.data));
   }, []);
 
   const handleChange = (field: string, value: string) => {
@@ -49,7 +49,7 @@ export default function Apply() {
 
     setStatus("Submitting...");
     try {
-      await axios.post("http://localhost:4000/applications/submit", data, {
+      await axios.post(`${API_BASE}/applications/submit`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setStatus("Application submitted successfully.");
