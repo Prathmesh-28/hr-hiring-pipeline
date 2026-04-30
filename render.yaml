@@ -1,0 +1,34 @@
+services:
+  - type: web_service
+    name: hr-api
+    env: node
+    plan: starter
+    branch: main
+    buildCommand: yarn install && yarn workspace api build
+    startCommand: cd services/api && yarn start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: DATABASE_URL
+        value: postgres://USER:PASSWORD@HOST:PORT/DATABASE
+      - key: AWS_ACCESS_KEY_ID
+        value: your_aws_access_key_id
+      - key: AWS_SECRET_ACCESS_KEY
+        value: your_aws_secret_access_key
+      - key: AWS_REGION
+        value: your_aws_region
+      - key: S3_BUCKET
+        value: your_s3_bucket_name
+      - key: SENDGRID_API_KEY
+        value: your_sendgrid_api_key
+      - key: JWT_SECRET
+        value: changeme
+      - key: DOCUSIGN_ACCOUNT_ID
+        value: your_docusign_account_id
+      - key: DOCUSIGN_ACCESS_TOKEN
+        value: your_docusign_access_token
+      - key: TIMEZONE
+        value: UTC

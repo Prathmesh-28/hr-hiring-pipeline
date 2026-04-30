@@ -58,3 +58,13 @@ For MVP variations, see `docs/mvp-options.md`, `docs/supabase-firebase-mvp.md`, 
 4. Deploy using your preferred cloud provider.
 
 > See `docs/architecture.md`, `docs/implementation-plan.md`, and `docs/integration-overview.md` for full deployment and execution guidance.
+
+## Deployment
+
+The backend can be deployed to Render using `render.yaml` and the API service in `services/api`.
+
+The candidate portal and HR dashboard are separate Next.js apps and can be deployed to Vercel from `apps/career-portal` and `apps/hr-dashboard`.
+
+For a deployment-ready build, set `NEXT_PUBLIC_API_URL` in each frontend app to the Render backend URL.
+
+See `docs/deployment.md` for full deployment setup.
