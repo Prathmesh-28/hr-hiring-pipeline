@@ -12,10 +12,10 @@ The API service lives in `services/api` and should be deployed on Render as a No
 Required Render environment variables:
 
 - `DATABASE_URL` - your PostgreSQL connection string
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `AWS_REGION`
-- `S3_BUCKET`
+- `S3_ACCESS_KEY_ID`
+- `S3_SECRET_ACCESS_KEY`
+- `S3_REGION`
+- `S3_BUCKET_NAME`
 - `SENDGRID_API_KEY`
 - `JWT_SECRET`
 - `DOCUSIGN_ACCOUNT_ID`

@@ -14,13 +14,13 @@ services:
         value: 4000
       - key: DATABASE_URL
         value: postgres://USER:PASSWORD@HOST:PORT/DATABASE
-      - key: AWS_ACCESS_KEY_ID
+      - key: S3_ACCESS_KEY_ID
         value: your_aws_access_key_id
-      - key: AWS_SECRET_ACCESS_KEY
+      - key: S3_SECRET_ACCESS_KEY
         value: your_aws_secret_access_key
-      - key: AWS_REGION
+      - key: S3_REGION
         value: your_aws_region
-      - key: S3_BUCKET
+      - key: S3_BUCKET_NAME
         value: your_s3_bucket_name
       - key: SENDGRID_API_KEY
         value: your_sendgrid_api_key
