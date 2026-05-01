@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Apply — HR Hiring Portal{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 760px;">
+  <h1>Candidate Application</h1>
+  <p class="subtitle">Complete your application below. Fields marked * are required.</p>
+
+  {% if success %}
+    <div class="alert alert-success">
+      ✅ Your application was submitted successfully! We'll be in touch soon.
+    </div>
+    <a href="/" class="btn btn-primary">Back to Careers</a>
+  {% else %}
+
+    {% if error %}
+      <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+
+    <div class="card">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>First Name *</label>
+            <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" required placeholder="First Name" />
+          </div>
+          <div class="form-group">
+            <label>Last Name *</label>
+            <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" required placeholder="Last Name" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" name="email" value="{{ form.email.value|default:'' }}" required placeholder="you@example.com" />
+        </div>
+
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" name="phone" value="{{ form.phone.value|default:'' }}" placeholder="+1 555 000 0000" />
+        </div>
+
+        <div class="form-group">
+          <label>Job Role *</label>
+          <select name="job_id" required>
+            <option value="">Select a role</option>
+            {% for job in jobs %}
+              <option value="{{ job.id }}" {% if request.GET.job == job.id|stringformat:"s" %}selected{% endif %}>
+                {{ job.title }} — {{ job.location }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Current Company</label>
+            <input type="text" name="current_company" value="{{ form.current_company.value|default:'' }}" placeholder="Company name" />
+          </div>
+          <div class="form-group">
+            <label>Current Title</label>
+            <input type="text" name="current_title" value="{{ form.current_title.value|default:'' }}" placeholder="Your title" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" name="location" value="{{ form.location.value|default:'' }}" placeholder="City, Country" />
+        </div>
+
+        <div class="form-group">
+          <label>Resume * (PDF or Word)</label>
+          <input type="file" name="resume" accept=".pdf,.doc,.docx" required />
+        </div>
+
+        <div class="form-group">
+          <label>Why are you a great fit?</label>
+          <textarea name="answers" rows="5" placeholder="Tell us about your experience, availability, or anything else relevant.">{{ form.answers.value|default:'' }}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-dark btn-full" style="margin-top:8px;">Submit Application</button>
+      </form>
+    </div>
+
+  {% endif %}
+</div>
+{% endblock %}

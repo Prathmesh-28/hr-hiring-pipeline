@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}HR Pipeline — Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+  .pipeline-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .candidate-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px;
+    transition: box-shadow 0.2s;
+  }
+  .candidate-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .candidate-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+  .candidate-card .meta { color: #64748b; font-size: 0.82rem; margin-bottom: 3px; }
+  .candidate-card .score { font-size: 0.82rem; color: #475569; margin-bottom: 14px; }
+
+  .schedule-btn {
+    display: block;
+    width: 100%;
+    padding: 9px 0;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .schedule-btn:hover { background: #1d4ed8; }
+  .schedule-btn.active { background: #0f172a; }
+
+  .sidebar-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    position: sticky;
+    top: 24px;
+  }
+  .sidebar-card h2 { font-size: 1.1rem; margin-bottom: 6px; }
+  .sidebar-card .hint { color: #94a3b8; font-size: 0.88rem; }
+  .candidate-info { background: #f8fafc; border-radius: 10px; padding: 14px; margin-bottom: 18px; font-size: 0.88rem; }
+  .candidate-info strong { display: block; font-size: 1rem; margin-bottom: 4px; }
+
+  .empty-pipeline {
+    text-align: center;
+    padding: 60px 24px;
+    color: #94a3b8;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+  }
+
+  @media (max-width: 768px) {
+    .pipeline-layout { grid-template-columns: 1fr; }
+    .sidebar-card { position: static; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+    <h1>HR Pipeline</h1>
+    <a href="/admin/" class="btn btn-dark" style="font-size:0.85rem; padding:8px 16px;">Admin Panel</a>
+  </div>
+  <p class="subtitle">{{ applications|length }} candidate{{ applications|length|pluralize }} in the pipeline.</p>
+
+  {% if messages %}
+    {% for msg in messages %}
+      <div class="alert alert-success">{{ msg }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="pipeline-layout">
+
+    <!-- Candidate cards -->
+    <div>
+      {% if applications %}
+        <div class="candidates-grid">
+          {% for app in applications %}
+            <div class="candidate-card">
+              <h3>{{ app.candidate.full_name }}</h3>
+              <p class="meta">{{ app.candidate.email }}</p>
+              {% if app.candidate.location %}<p class="meta">📍 {{ app.candidate.location }}</p>{% endif %}
+              <p class="meta" style="margin-top:10px;">
+                <span class="badge" style="background: {% if app.stage == 'APPLIED' %}#2563eb{% elif app.stage == 'SCREENING' %}#7c3aed{% elif app.stage == 'INTERVIEW' %}#d97706{% elif app.stage == 'OFFER' %}#059669{% elif app.stage == 'HIRED' %}#16a34a{% else %}#dc2626{% endif %};">
+                  {{ app.stage }}
+                </span>
+                &nbsp; {{ app.job.title }}
+              </p>
+              <p class="score">Score: {{ app.score|default:"N/A" }}</p>
+              <a href="?schedule={{ app.id }}"
+                 class="schedule-btn {% if selected.id == app.id %}active{% endif %}">
+                {% if selected.id == app.id %}✓ Scheduling…{% else %}Schedule Interview{% endif %}
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-pipeline">
+          <p style="font-size:1.1rem;">No applications yet.</p>
+          <p style="margin-top:8px; font-size:0.88rem;">Share your careers page to start receiving candidates.</p>
+          <a href="/" class="btn btn-primary" style="margin-top:20px;">View Careers Page</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Interview Scheduler sidebar -->
+    <div class="sidebar-card">
+      <h2>Interview Scheduler</h2>
+
+      {% if selected %}
+        <div class="candidate-info">
+          <strong>{{ selected.candidate.full_name }}</strong>
+          {{ selected.candidate.email }}<br/>
+          Role: {{ selected.job.title }}
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label>Topic</label>
+            <input type="text" name="topic" value="Interview with {{ selected.candidate.first_name }}" required />
+          </div>
+          <div class="form-group">
+            <label>Start Time</label>
+            <input type="datetime-local" name="start_time" required />
+          </div>
+          <div class="form-group">
+            <label>Duration (minutes)</label>
+            <input type="number" name="duration_minutes" value="30" min="15" required />
+          </div>
+          <button type="submit" class="btn btn-dark btn-full">Send Invite</button>
+          <a href="/hr/dashboard/" style="display:block; text-align:center; margin-top:12px; font-size:0.85rem; color:#64748b;">Cancel</a>
+        </form>
+
+        {% if selected.interviews.all %}
+          <hr style="margin: 20px 0; border-color: #e2e8f0;" />
+          <p style="font-size:0.82rem; font-weight:600; color:#374151; margin-bottom:10px;">Past Interviews</p>
+          {% for iv in selected.interviews.all %}
+            <p style="font-size:0.82rem; color:#64748b; margin-bottom:4px;">• {{ iv.topic }} — {{ iv.start_time|date:"M d, Y H:i" }}</p>
+          {% endfor %}
+        {% endif %}
+
+      {% else %}
+        <p class="hint">Click "Schedule Interview" on any candidate card to open the scheduling form here.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

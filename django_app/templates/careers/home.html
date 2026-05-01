@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Careers — HR Hiring Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    color: white;
+    padding: 80px 24px;
+    text-align: center;
+  }
+  .hero h1 { font-size: 3rem; color: white; margin-bottom: 16px; }
+  .hero p { font-size: 1.15rem; color: #93c5fd; max-width: 560px; margin: 0 auto 40px; line-height: 1.7; }
+
+  .jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 32px;
+  }
+
+  .job-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .job-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+  .job-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+  .job-card .location { color: #64748b; font-size: 0.9rem; margin-bottom: 16px; }
+  .job-card .location::before { content: "📍 "; }
+  .job-card a.apply-btn {
+    display: inline-block;
+    padding: 9px 20px;
+    background: #2563eb;
+    color: white;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .job-card a.apply-btn:hover { background: #1d4ed8; }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: #94a3b8;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <h1>Join Our Team</h1>
+  <p>Apply for open positions, upload your resume, and receive automated status updates throughout the hiring process.</p>
+  <a href="/apply/" class="btn btn-primary" style="font-size:1rem; padding: 14px 32px;">Start Application</a>
+</div>
+
+<div class="container">
+  <h2>Open Positions</h2>
+  <p class="subtitle">Browse all active roles below. Click "Apply Now" on any card to get started.</p>
+
+  {% if jobs %}
+    <div class="jobs-grid">
+      {% for job in jobs %}
+        <div class="job-card">
+          <h3>{{ job.title }}</h3>
+          <p class="location">{{ job.location }}</p>
+          {% if job.description %}
+            <p style="font-size:0.88rem; color:#475569; margin-bottom:16px; line-height:1.6;">{{ job.description|truncatewords:20 }}</p>
+          {% endif %}
+          <a href="/apply/?job={{ job.id }}" class="apply-btn">Apply Now</a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p style="font-size:1.2rem;">No open positions right now.</p>
+      <p style="margin-top:8px; font-size:0.9rem;">Check back soon — we're always growing!</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

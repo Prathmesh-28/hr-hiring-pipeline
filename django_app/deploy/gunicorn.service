@@ -1,0 +1,19 @@
+[Unit]
+Description=Gunicorn daemon for HR Django app
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/opt/hr/django_app
+EnvironmentFile=/opt/hr/django_app/.env
+ExecStart=/opt/hr/django_app/venv/bin/gunicorn \
+    --workers 3 \
+    --bind 127.0.0.1:8000 \
+    --access-logfile /var/log/gunicorn/access.log \
+    --error-logfile /var/log/gunicorn/error.log \
+    hr_project.wsgi:application
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

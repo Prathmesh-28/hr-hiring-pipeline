@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}HR Login{% endblock %}
+
+{% block extra_css %}
+<style>
+  body { display: flex; flex-direction: column; }
+  .login-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    background: #f1f5f9;
+  }
+  .login-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+  .login-card h1 { font-size: 1.6rem; margin-bottom: 6px; }
+  .login-card .sub { color: #64748b; font-size: 0.9rem; margin-bottom: 28px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card">
+    <h1>HR Login</h1>
+    <p class="sub">Sign in to manage the hiring pipeline.</p>
+
+    {% if error %}
+      <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" required autofocus placeholder="hr@company.com" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" required placeholder="••••••••" />
+      </div>
+      <button type="submit" class="btn btn-dark btn-full" style="margin-top:8px;">Sign in</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
